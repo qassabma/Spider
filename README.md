@@ -1,4 +1,4 @@
-# **Spider Sniper Scanner** 🕸️🎯
+# **🕷️🕷️ $Sniper_$Spider 🕷️🕷️** 🕸️🎯
 
 ## **Overview**
 Welcome to the **Spider Sniper Scanner**, a Python-powered framework for detecting **unparalleled market opportunities** using institutional-grade data. This scanner is designed for **kings** of the markets, identifying cheap options, high-potential short plays, and airpocket opportunities with unparalleled precision. 👑
@@ -71,7 +71,7 @@ META, --, Airpocket, 59%, --, CAUTION
 3. Set up your **API Key**:
    - Add your API key to an `.env` file:
      ```
-     SPIDER_API_KEY=your_api_key_here
+     SNIPER_SPIDER_API_KEY=your_api_key_here
      ```
 
 4. Run the scanner:
