@@ -1,3 +1,4 @@
 flask
 requests
-numpy 
+numpy
+python-dotenv
