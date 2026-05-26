@@ -1,37 +1,39 @@
 name: Sniper Scanner Automation
 
 on:
+  push:
+    branches:
+      - main
   schedule:
-    - cron: "0 3 * * *" # Runs daily at 3:00 AM UTC
-  workflow_dispatch: # Allows manual triggering from GitHub
+    - cron: "0 3 * * *"
+  workflow_dispatch:
 
 jobs:
   run-sniper-scanner:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
       - name: Check Current Branch and Commit
         run: |
-          echo "Current Branch and Commit:"
           git rev-parse HEAD
-          git branch
-          echo "Directory Listing:"
+          pwd
           ls -la
+          test -f requirements.txt
+          cat requirements.txt
 
       - name: Install Dependencies
         run: |
-          echo "Installing Dependencies..."
-          pwd
-          ls -la
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r ./requirements.txt
 
       - name: Run Sniper Scanner
         env:
