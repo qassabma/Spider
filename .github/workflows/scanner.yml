@@ -50,6 +50,9 @@ jobs:
           print("HTTP_STATUS =", r.status_code)
           print("RESPONSE_LENGTH =", len(r.text))
 
+          with open("response.json", "w", encoding="utf-8") as f:
+              f.write(r.text)
+
           try:
               data = r.json()
 
@@ -81,3 +84,4 @@ jobs:
         with:
           name: api-response-raw
           path: response.json
+          if-no-files-found: error
