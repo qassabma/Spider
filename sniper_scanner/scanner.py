@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-API_KEY = os.getenv("SNIPER_SPIDER_API_KEY")
+API_KEY = os.getenv("SPIDERROCK_API_KEY")
 
 # Placeholder imports for signal modules
 from signals.cheap_calls import detect_cheap_calls
