@@ -12,15 +12,28 @@ from signals.short_stocks import detect_short_stocks
 from signals.airpockets import detect_airpockets
 
 def run():
-    print(f"👑 Sniper Scanner Starting (API Key: {API_KEY[:4]}...)")
+    # Verify and print masked API key
+    if not API_KEY:
+        print("❌ API key not found! Exiting.")
+        return
+    print(f"👑 Sniper Scanner Starting - API loaded: {API_KEY[:4]}...")
 
-    # Run signal workflows
-    cheap_calls = detect_cheap_calls()
-    cheap_puts = detect_cheap_puts()
-    short_stocks = detect_short_stocks()
-    airpockets = detect_airpockets()
+    # Load tickers dynamically from tickers.txt
+    try:
+        with open("tickers.txt", "r") as file:
+            tickers = [line.strip() for line in file.readlines()]
+            print(f"✅ Loaded tickers: {tickers}")
+    except FileNotFoundError:
+        print("❌ tickers.txt not found! Exiting.")
+        return
 
-    # Placeholder for saving results
+    # Run signal workflows with loaded tickers
+    cheap_calls = detect_cheap_calls(tickers)
+    cheap_puts = detect_cheap_puts(tickers)
+    short_stocks = detect_short_stocks(tickers)
+    airpockets = detect_airpockets(tickers)
+
+    # Save results to reports
     save_to_report("Cheap_Calls.csv", cheap_calls)
     save_to_report("Cheap_Puts.csv", cheap_puts)
     save_to_report("Short_Stocks.csv", short_stocks)
@@ -29,9 +42,13 @@ def run():
     print("✅ All scans complete! Reports saved.")
 
 def save_to_report(filename, data):
-    # Placeholder for saving logic
+    import csv
     print(f"Saving {filename}...")
-    # TODO: Implement saving logic to CSV
+    with open(filename, mode="w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=["ticker", "status"])
+        writer.writeheader()
+        writer.writerows(data)
+    print(f"✅ {filename} saved successfully!")
 
 if __name__ == "__main__":
     run()
