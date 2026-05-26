@@ -11,31 +11,32 @@ on:
 jobs:
   run-sniper-scanner:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
-      - name: Check Current Branch and Commit
-        run: |
-          git rev-parse HEAD
-          pwd
-          ls -la
-          test -f requirements.txt
-          cat requirements.txt
-
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r ./requirements.txt
+          python -m pip install -r requirements.txt
 
       - name: Run Sniper Scanner
         env:
-          SNIPER_SPIDER_API_KEY: ${{ secrets.SNIPER_SPIDER_API_KEY }}
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
         run: python sniper_scanner/scanner.py
+
+      - name: Upload Scan Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-reports
+          path: |
+            Cheap_Calls.csv
+            Cheap_Puts.csv
+            Short_Stocks.csv
+            Airpockets.csv
