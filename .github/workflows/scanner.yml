@@ -17,8 +17,21 @@ jobs:
         with:
           python-version: "3.9"
 
+      - name: Check Current Branch and Commit
+        run: |
+          echo "Current Branch and Commit:"
+          git rev-parse HEAD
+          git branch
+          echo "Directory Listing:"
+          ls -la
+
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: |
+          echo "Installing Dependencies..."
+          pwd
+          ls -la
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run Sniper Scanner
         env:
