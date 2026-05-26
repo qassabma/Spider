@@ -26,17 +26,58 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Run Sniper Scanner
+      - name: Test SpiderRock API
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
-        run: python sniper_scanner/scanner.py
+        run: |
+          python - << 'PY'
+          import os
+          import requests
+          import json
 
-      - name: Upload Scan Results
+          key = os.getenv("SPIDERROCK_API_KEY")
+
+          print("KEY_PRESENT =", bool(key))
+          print("KEY_LENGTH =", len(key) if key else 0)
+
+          url = (
+              "https://mlink-live.nms.saturn.spiderrockconnect.com/"
+              "rest/json?cmd=getmsgtypes&apikey=" + key
+          )
+
+          r = requests.get(url, timeout=30)
+
+          print("HTTP_STATUS =", r.status_code)
+          print("RESPONSE_LENGTH =", len(r.text))
+
+          try:
+              data = r.json()
+
+              names = []
+
+              if isinstance(data, list):
+                  for x in data:
+                      try:
+                          if (
+                              x.get("header", {}).get("mTyp") == "MsgDesc"
+                          ):
+                              names.append(
+                                  x.get("message", {}).get("name")
+                              )
+                      except:
+                          pass
+
+              print("MESSAGE_TYPES_FOUND =", len(names))
+              print("FIRST_20 =", names[:20])
+
+          except Exception as e:
+              print("JSON_PARSE_ERROR =", str(e))
+              print(r.text[:2000])
+
+          PY
+
+      - name: Upload Raw API Response
         uses: actions/upload-artifact@v4
         with:
-          name: scan-reports
-          path: |
-            Cheap_Calls.csv
-            Cheap_Puts.csv
-            Short_Stocks.csv
-            Airpockets.csv
+          name: api-response-raw
+          path: response.json
