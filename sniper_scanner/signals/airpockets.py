@@ -1,4 +1,7 @@
-def detect_airpockets():
+def detect_airpockets(tickers):
     print("🌪️ Detecting Airpocket Candidates...")
-    # TODO: Implement Airpocket detection logic
-    return []  # Placeholder data
+    results = []
+    for ticker in tickers:
+        print(f"Analyzing {ticker} for airpockets...")
+        results.append({"ticker": ticker, "status": "placeholder_scan"})
+    return results
