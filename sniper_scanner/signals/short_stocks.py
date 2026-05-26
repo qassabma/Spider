@@ -1,4 +1,7 @@
-def detect_short_stocks():
+def detect_short_stocks(tickers):
     print("🔍 Detecting Short Stocks...")
-    # TODO: Implement Short Stock detection logic
-    return []  # Placeholder data
+    results = []
+    for ticker in tickers:
+        print(f"Analyzing {ticker} for short stocks...")
+        results.append({"ticker": ticker, "status": "placeholder_scan"})
+    return results
