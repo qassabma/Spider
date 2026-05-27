@@ -1,25 +1,11 @@
-name: Phase 6 Full Scanner Automation
+name: Phase 6 Full Pipeline (manual only)
 
 on:
   workflow_dispatch:
-  schedule:
-    # US market schedule in UTC during daylight saving time.
-    # Pre-market: 08:30 ET
-    - cron: "30 12 * * 1-5"
-    # Opening reaction window: 09:45 ET
-    - cron: "45 13 * * 1-5"
-    # Midday: 12:30 ET
-    - cron: "30 16 * * 1-5"
-    # Power hour: 15:15 ET
-    - cron: "15 19 * * 1-5"
 
 jobs:
   phase6-full-automation:
     runs-on: ubuntu-latest
-    concurrency:
-      group: phase6-full-scanner-automation
-      cancel-in-progress: true
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -77,7 +77,7 @@ Each report card includes:
 - option volume
 - failure conditions
 
-## Phase 6 — Full Automation
+## Phase 6 — Full Pipeline (optional)
 
 File:
 - `sniper_scanner/phase6_full_pipeline.py`
@@ -85,15 +85,16 @@ File:
 Workflow:
 - `.github/workflows/phase6-full-automation.yml`
 
-Runs:
-- manual workflow dispatch
-- scheduled pre-market
-- scheduled open-reaction window
-- scheduled midday
-- scheduled power hour
+Runs only when you start it manually (`workflow_dispatch`). No schedules, no push triggers.
+Chains Phase 3 → 4 → 5 in one run if you choose to use it.
 
 Output artifact:
 - `phase6-full-automation`
+
+## Operator control
+
+Phases 1–6 workflows do not run on a schedule or on git push.
+Each phase is your responsibility: run the scripts locally or trigger one workflow at a time in GitHub Actions after you have the inputs ready.
 
 ## Hard rule
 
