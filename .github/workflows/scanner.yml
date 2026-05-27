@@ -55,6 +55,7 @@ jobs:
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
           PYTHONUNBUFFERED: "1"
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           python -u sniper_scanner/edge_scan_pipeline.py
 
