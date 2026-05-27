@@ -1,27 +1,27 @@
-name: Sniper Scanner Automation
+name: Initiate Scan
 
 on:
   workflow_dispatch:
 
 jobs:
-  run-sniper-scanner:
+  initiate-scan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Verify SpiderRock API
+      - name: Verify SpiderRock API key
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
         run: |
@@ -41,14 +41,10 @@ jobs:
           )
           r = requests.get(url, timeout=30)
           print("HTTP_STATUS =", r.status_code)
-          print("RESPONSE_LENGTH =", len(r.text))
-
-          with open("response.json", "w", encoding="utf-8") as f:
-              f.write(r.text)
-
           if r.status_code != 200:
               print(r.text[:2000])
               sys.exit(1)
+          print("API key verified")
           PY
 
       - name: Run full scan pipeline (Phase 3 → 4 → 5)
@@ -61,10 +57,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sniper-scan-results
+          name: scan-results
           if-no-files-found: warn
           path: |
-            response.json
             phase6_pipeline_summary.json
             Final_Signals.md
             Final_Signals.csv

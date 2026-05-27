@@ -18,6 +18,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Phase 3 signal engine first
+        env:
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+        run: |
+          python sniper_scanner/phase3_signal_engine.py
 
       - name: Run Phase 4 Ranking
         run: |
