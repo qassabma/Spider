@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       scan_mode:
-        description: "edge = fast surface/flow (~3 min) | full = 72 tickers x 11 msgs (~60 min)"
+        description: "edge = 62 tickers x 6 msgs (~5-8 min) | full = 72 tickers x 11 msgs (~60 min)"
         required: true
         default: edge
         type: choice
@@ -62,7 +62,7 @@ jobs:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
           PYTHONUNBUFFERED: "1"
         run: |
-          echo "MODE=EDGE_FAST (24 tickers x 6 messages = 144 API calls, ~3-5 min)"
+          echo "MODE=EDGE_FAST (62 tickers x 6 messages = 372 API calls, ~5-8 min)"
           python -u sniper_scanner/edge_scan_pipeline.py
 
       - name: Run FULL harvest (slow)

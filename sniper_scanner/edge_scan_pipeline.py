@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast EDGE scan: focused tickers + surface/flow messages only (~2-5 min)."""
+"""Fast EDGE scan: 62-ticker universe + surface/flow messages."""
 from __future__ import annotations
 
 import json
@@ -15,21 +15,7 @@ for p in (str(ROOT), str(PKG)):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-EDGE_TICKERS = [
-    "SPY", "QQQ", "IWM", "VIX",
-    "NVDA", "TSLA", "AAPL", "AMD", "META",
-    "CRWV", "RDDT", "CVNA", "UPST", "IONQ", "SOUN", "QBTS", "RGTI",
-    "GME", "MARA", "RIOT", "HOOD", "SOFI", "RKLB", "DJT",
-]
-
-EDGE_MESSAGES = [
-    "LiveSurfaceFixedTerm",
-    "HistoricalVolatilities",
-    "LiveImpliedQuoteAdj",
-    "OptionPrintSet",
-    "OptionNbboQuote",
-    "StockBookQuote",
-]
+from ticker_universe import ALL62_TICKERS, EDGE_MESSAGES, EDGE_TICKERS  # noqa: E402
 
 
 def utc_now() -> str:
@@ -49,11 +35,12 @@ def main() -> int:
         json.dumps(
             {
                 "mode": "EDGE_FAST",
+                "ticker_universe": "ALL62",
                 "tickers": len(EDGE_TICKERS),
                 "messages": len(EDGE_MESSAGES),
                 "api_calls": len(EDGE_TICKERS) * len(EDGE_MESSAGES),
                 "cwd": str(Path.cwd()),
-                "note": "Focused edge scan — not full 792-call harvest",
+                "note": "62-name equity universe from tickers.txt (excludes macro/sector wrappers)",
             },
             indent=2,
         ),
@@ -64,8 +51,8 @@ def main() -> int:
     import phase4_rank_opportunities as phase4  # noqa: E402
     import phase5_execution_report as phase5  # noqa: E402
 
-    phase3.TICKERS = EDGE_TICKERS
-    phase3.MESSAGES = EDGE_MESSAGES
+    phase3.TICKERS = list(EDGE_TICKERS)
+    phase3.MESSAGES = list(EDGE_MESSAGES)
 
     steps = [
         ("EDGE_PHASE3", phase3.main),
@@ -90,6 +77,7 @@ def main() -> int:
     summary = {
         "timestamp_utc": utc_now(),
         "mode": "EDGE_FAST",
+        "ticker_universe": "ALL62",
         "tickers": EDGE_TICKERS,
         "messages": EDGE_MESSAGES,
         "steps": results,
