@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# SpiderRock phase discovery / health outputs
+live_row_discovery/
+live_row_discovery_summary.csv
+live_row_discovery_winners.json
+live_row_discovery_final_status.json
+phase2_raw_health/
+ticker_data_health.csv
+phase2_health_summary.json
+phase2_raw_results.json

@@ -1,0 +1,40 @@
+name: Phase 1 Live Row Discovery
+
+on:
+  workflow_dispatch:
+
+jobs:
+  phase1-live-row-discovery:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
+
+      - name: Run SpiderRock Live Row Discovery
+        env:
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+        run: |
+          python sniper_scanner/spiderrock_live_row_discovery.py
+
+      - name: Upload Phase 1 Discovery Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-live-row-discovery
+          if-no-files-found: error
+          path: |
+            live_row_discovery_summary.csv
+            live_row_discovery_winners.json
+            live_row_discovery_final_status.json
+            live_row_discovery/*.json

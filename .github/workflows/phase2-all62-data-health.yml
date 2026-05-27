@@ -1,0 +1,40 @@
+name: Phase 2 All-62 Data Health
+
+on:
+  workflow_dispatch:
+
+jobs:
+  phase2-all62-data-health:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
+
+      - name: Run Phase 2 All-62 Data Health
+        env:
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+        run: |
+          python sniper_scanner/spiderrock_phase2_data_health.py
+
+      - name: Upload Phase 2 Data Health Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase2-all62-data-health
+          if-no-files-found: error
+          path: |
+            ticker_data_health.csv
+            phase2_health_summary.json
+            phase2_raw_results.json
+            phase2_raw_health/*.json
