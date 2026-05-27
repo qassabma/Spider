@@ -1,0 +1,73 @@
+name: Rotating Scan Every 5m
+
+on:
+  schedule:
+    # Every 5 minutes (UTC). GitHub may delay scheduled runs by a few minutes.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: rotating-scan-5m
+  cancel-in-progress: false
+
+jobs:
+  rotating-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run rotating scan (18 endpoints × 58 messages × 62 tickers)
+        env:
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+          ROTATING_SCAN_WORKERS: "16"
+        run: |
+          echo "RUN_NUMBER=${{ github.run_number }}"
+          python -u sniper_scanner/rotating_scan.py
+
+      - name: Upload rotating scan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rotating-scan-${{ github.run_number }}
+          if-no-files-found: warn
+          path: |
+            rotating_scan_summary.json
+            scan_runs/latest_summary.json
+            scan_runs/run_*.json
+
+      - name: Workflow summary
+        if: always()
+        run: |
+          python - << 'PY'
+          import json
+          from pathlib import Path
+          p = Path("rotating_scan_summary.json")
+          if not p.is_file():
+              print("No summary file")
+              raise SystemExit(0)
+          s = json.loads(p.read_text(encoding="utf-8"))
+          with open("${{ github.step_summary }}", "a", encoding="utf-8") as f:
+              f.write("## Rotating Scan\n\n")
+              f.write(f"- Run index: **{s.get('run_index')}**\n")
+              f.write(f"- Endpoint index: **{s.get('endpoint_index')}** / 17\n")
+              f.write(f"- API calls: **{s.get('api_calls')}**\n")
+              f.write(f"- Live hits: **{s.get('live_hits')}** | Errors: **{s.get('errors')}**\n")
+              f.write(f"- Elapsed: **{s.get('elapsed_seconds')}s**\n\n")
+              f.write("### Top live tickers\n")
+              for row in s.get("top_live_tickers", [])[:5]:
+                  f.write(f"- {row['ticker']}: {row['rows']} rows\n")
+          PY
