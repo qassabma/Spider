@@ -17,18 +17,12 @@ def utc_now() -> str:
 
 
 def run_step(name, cmd):
-    print(f"=== {name} ===")
-    proc = subprocess.run(cmd, text=True, capture_output=True)
-    print(proc.stdout)
-    if proc.stderr:
-        print(proc.stderr, file=sys.stderr)
-
+    print(f"=== {name} ===", flush=True)
+    proc = subprocess.run(cmd, text=True)
     return {
         "name": name,
         "cmd": cmd,
         "returncode": proc.returncode,
-        "stdout_tail": proc.stdout[-4000:],
-        "stderr_tail": proc.stderr[-4000:],
     }
 
 

@@ -508,7 +508,8 @@ def main() -> None:
     raw_meta: List[Dict[str, Any]] = []
     metrics_rows: List[Dict[str, Any]] = []
 
-    for ticker in TICKERS:
+    for i, ticker in enumerate(TICKERS, 1):
+        print(f"[phase3] ticker {i}/{len(TICKERS)}: {ticker}", flush=True)
         per_message: Dict[str, List[Dict[str, Any]]] = {}
         metas: Dict[str, Dict[str, Any]] = {}
 

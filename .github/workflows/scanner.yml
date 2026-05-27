@@ -54,8 +54,9 @@ jobs:
       - name: Run full scan pipeline (Phase 3 → 4 → 5)
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+          PYTHONUNBUFFERED: "1"
         run: |
-          python sniper_scanner/phase6_full_pipeline.py
+          python -u sniper_scanner/phase6_full_pipeline.py
 
       - name: Upload scan artifacts
         if: always()
