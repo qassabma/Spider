@@ -2,6 +2,15 @@ name: Initiate Scan
 
 on:
   workflow_dispatch:
+    inputs:
+      scan_mode:
+        description: "edge = fast surface/flow (~3 min) | full = 72 tickers x 11 msgs (~60 min)"
+        required: true
+        default: edge
+        type: choice
+        options:
+          - edge
+          - full
 
 jobs:
   initiate-scan:
@@ -47,20 +56,32 @@ jobs:
           print("API key verified")
           PY
 
-      - name: Run full scan pipeline (Phase 3 → 4 → 5)
+      - name: Run EDGE scan (fast)
+        if: inputs.scan_mode == 'edge'
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
           PYTHONUNBUFFERED: "1"
         run: |
+          echo "MODE=EDGE_FAST (24 tickers x 6 messages = 144 API calls, ~3-5 min)"
+          python -u sniper_scanner/edge_scan_pipeline.py
+
+      - name: Run FULL harvest (slow)
+        if: inputs.scan_mode == 'full'
+        env:
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          echo "MODE=FULL_HARVEST (72 tickers x 11 messages = 792 API calls, ~30-60 min)"
           python -u sniper_scanner/phase6_full_pipeline.py
 
       - name: Upload scan artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scan-results
+          name: scan-results-${{ inputs.scan_mode }}
           if-no-files-found: warn
           path: |
+            edge_scan_summary.json
             phase6_pipeline_summary.json
             Final_Signals.md
             Final_Signals.csv
