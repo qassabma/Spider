@@ -1,0 +1,46 @@
+name: Phase 4 Rank Opportunities
+
+on:
+  workflow_dispatch:
+
+jobs:
+  phase4-rank-opportunities:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Run Phase 3 First
+        env:
+          SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
+        run: |
+          pip install requests python-dotenv
+          python sniper_scanner/phase3_signal_engine.py
+
+      - name: Run Phase 4 Ranking
+        run: |
+          python sniper_scanner/phase4_rank_opportunities.py
+
+      - name: Upload Phase 4 Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-ranked-opportunities
+          if-no-files-found: error
+          path: |
+            Ranked_Opportunities.csv
+            phase4_ranking_summary.json
+            Raw_Live_Metrics.csv
+            Cheap_Calls.csv
+            Cheap_Puts.csv
+            Short_Stocks.csv
+            Airpockets.csv

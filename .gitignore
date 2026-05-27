@@ -226,3 +226,19 @@ phase2_raw_health/
 ticker_data_health.csv
 phase2_health_summary.json
 phase2_raw_results.json
+
+# SpiderRock phases 3-6 outputs
+phase3_raw_live/
+Raw_Live_Metrics.csv
+phase3_query_meta.csv
+phase3_signal_summary.json
+Cheap_Calls.csv
+Cheap_Puts.csv
+Short_Stocks.csv
+Airpockets.csv
+Ranked_Opportunities.csv
+phase4_ranking_summary.json
+Final_Signals.md
+Final_Signals.csv
+phase5_execution_summary.json
+phase6_pipeline_summary.json
