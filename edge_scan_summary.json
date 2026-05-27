@@ -1,0 +1,50 @@
+{
+  "timestamp_utc": "2026-05-27T17:35:33.605521+00:00",
+  "mode": "EDGE_FAST",
+  "tickers": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "VIX",
+    "NVDA",
+    "TSLA",
+    "AAPL",
+    "AMD",
+    "META",
+    "CRWV",
+    "RDDT",
+    "CVNA",
+    "UPST",
+    "IONQ",
+    "SOUN",
+    "QBTS",
+    "RGTI",
+    "GME",
+    "MARA",
+    "RIOT",
+    "HOOD",
+    "SOFI",
+    "RKLB",
+    "DJT"
+  ],
+  "messages": [
+    "LiveSurfaceFixedTerm",
+    "HistoricalVolatilities",
+    "LiveImpliedQuoteAdj",
+    "OptionPrintSet",
+    "OptionNbboQuote",
+    "StockBookQuote"
+  ],
+  "steps": [
+    {
+      "name": "EDGE_PHASE3",
+      "cmd": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+        "-u",
+        "sniper_scanner/edge_phase3.py"
+      ],
+      "returncode": 1
+    }
+  ],
+  "stop_condition": "STOP_EDGE_SCAN_FAILED"
+}

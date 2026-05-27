@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 import json
-import subprocess
+import os
 import sys
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Indices + gamma-priority names only — not the full 72-ticker harvest.
+ROOT = Path(__file__).resolve().parent.parent
+PKG = Path(__file__).resolve().parent
+for p in (str(ROOT), str(PKG)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 EDGE_TICKERS = [
     "SPY", "QQQ", "IWM", "VIX",
     "NVDA", "TSLA", "AAPL", "AMD", "META",
@@ -16,7 +22,6 @@ EDGE_TICKERS = [
     "GME", "MARA", "RIOT", "HOOD", "SOFI", "RKLB", "DJT",
 ]
 
-# Surface + implied + flow — edge discovery messages, not full 11-type harvest.
 EDGE_MESSAGES = [
     "LiveSurfaceFixedTerm",
     "HistoricalVolatilities",
@@ -26,24 +31,20 @@ EDGE_MESSAGES = [
     "StockBookQuote",
 ]
 
-STEPS = [
-    ("EDGE_PHASE3", [sys.executable, "-u", "sniper_scanner/edge_phase3.py"]),
-    ("EDGE_PHASE4", [sys.executable, "-u", "sniper_scanner/phase4_rank_opportunities.py"]),
-    ("EDGE_PHASE5", [sys.executable, "-u", "sniper_scanner/phase5_execution_report.py"]),
-]
-
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def run_step(name: str, cmd: list[str]) -> dict:
-    print(f"=== {name} ===", flush=True)
-    proc = subprocess.run(cmd, text=True)
-    return {"name": name, "cmd": cmd, "returncode": proc.returncode}
-
-
 def main() -> int:
+    os.chdir(ROOT)
+
+    key = os.getenv("SPIDERROCK_API_KEY", "")
+    if not key:
+        print("ERROR: SPIDERROCK_API_KEY is not set in environment", file=sys.stderr, flush=True)
+        return 1
+    print(f"SPIDERROCK_API_KEY present (length={len(key)})", flush=True)
+
     print(
         json.dumps(
             {
@@ -51,6 +52,7 @@ def main() -> int:
                 "tickers": len(EDGE_TICKERS),
                 "messages": len(EDGE_MESSAGES),
                 "api_calls": len(EDGE_TICKERS) * len(EDGE_MESSAGES),
+                "cwd": str(Path.cwd()),
                 "note": "Focused edge scan — not full 792-call harvest",
             },
             indent=2,
@@ -58,13 +60,31 @@ def main() -> int:
         flush=True,
     )
 
-    results = []
+    import phase3_signal_engine as phase3  # noqa: E402
+    import phase4_rank_opportunities as phase4  # noqa: E402
+    import phase5_execution_report as phase5  # noqa: E402
+
+    phase3.TICKERS = EDGE_TICKERS
+    phase3.MESSAGES = EDGE_MESSAGES
+
+    steps = [
+        ("EDGE_PHASE3", phase3.main),
+        ("EDGE_PHASE4", phase4.main),
+        ("EDGE_PHASE5", phase5.main),
+    ]
+
+    results: list[dict] = []
     failed = False
-    for name, cmd in STEPS:
-        result = run_step(name, cmd)
-        results.append(result)
-        if result["returncode"] != 0:
+
+    for name, fn in steps:
+        print(f"=== {name} ===", flush=True)
+        try:
+            fn()
+            results.append({"name": name, "returncode": 0})
+        except Exception as exc:
             failed = True
+            traceback.print_exc()
+            results.append({"name": name, "returncode": 1, "error": str(exc)})
             break
 
     summary = {
