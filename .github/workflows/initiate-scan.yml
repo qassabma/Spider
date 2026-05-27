@@ -62,9 +62,10 @@ jobs:
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
           PYTHONUNBUFFERED: "1"
-          ROTATING_SCAN_WORKERS: "16"
+          ROTATING_SCAN_WORKERS: "8"
+          ROTATING_SCAN_DELAY: "0.05"
         run: |
-          echo "MODE=ROTATING (62 tickers x 58 messages x 1 endpoint slice, parallel)"
+          echo "MODE=ROTATING (62 tickers x ~4 msgs x 1 endpoint, ~250 calls)"
           python -u sniper_scanner/rotating_scan.py
 
       - name: Run EDGE scan (fast)

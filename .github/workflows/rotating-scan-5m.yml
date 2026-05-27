@@ -13,7 +13,7 @@ concurrency:
 jobs:
   rotating-scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -33,9 +33,11 @@ jobs:
         env:
           SPIDERROCK_API_KEY: ${{ secrets.SPIDERROCK_API_KEY }}
           PYTHONUNBUFFERED: "1"
-          ROTATING_SCAN_WORKERS: "16"
+          ROTATING_SCAN_WORKERS: "8"
+          ROTATING_SCAN_DELAY: "0.05"
         run: |
           echo "RUN_NUMBER=${{ github.run_number }}"
+          echo "Each run: 1 endpoint slice + ~4 of 58 messages + 62 tickers (~250 calls)"
           python -u sniper_scanner/rotating_scan.py
 
       - name: Upload rotating scan artifacts
